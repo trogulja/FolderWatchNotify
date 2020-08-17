@@ -5,7 +5,7 @@ const watcher = require('chokidar');
 const { debounce, set } = require('lodash');
 const { EventEmitter } = require('events');
 const { autoUpdater } = require('electron');
-let ps, ps2;
+let ps;
 
 // folder checker
 let localTest = path.join(process.env.TEMP || process.env.TMP, 'test_folders');
@@ -343,6 +343,12 @@ class FolderMonitor {
   }
 
   static shutDownForUpdate() {
+    [('input', 'output')].forEach((el) => {
+      ['local', 'remote'].forEach((el2) => {
+        this.folders[el][el2].watcher.close();
+      });
+    });
+
     ps.dispose()
       .then(() => {
         autoUpdater.quitAndInstall();
