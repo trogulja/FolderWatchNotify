@@ -162,7 +162,7 @@ function parsePath(fullpath, type) {
       if (frag.length <= 5) return { str: fullpath, err: 'ANTENNE file path length not 6+' };
     }
     return {
-      root: frag[2],
+      root: path.join('\\\\srvczg-files\\ftp_hr_m4\\_JOBS\\', frag[2]),
       type: frag[3],
       profile: 'Newspaper Coldset V5',
       name: frag[4],
@@ -186,7 +186,7 @@ function parsePath(fullpath, type) {
   const profile = frag[3] === 'heatset' ? frag[4] : 'Newspaper Coldset V5';
   const name = frag[3] === 'heatset' ? frag[5] : frag[4];
 
-  return { root: frag[2], type: frag[3], profile, name, path: fullpath };
+  return { root: path.join('\\\\srvczg-files\\ftp_hr_m4\\_JOBS\\', frag[2]), type: frag[3], profile, name, path: fullpath };
 }
 
 function parseFileStatus(fullpath) {
