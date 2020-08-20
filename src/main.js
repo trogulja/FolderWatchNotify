@@ -13,6 +13,7 @@ require('update-electron-app')();
 
 // Auto SET ENV - when deployed, paths change somewhat
 if (process.execPath.search('electron.exe') !== -1) environment = 'development';
+if (environment === 'development') require('dotenv').config();
 
 const mainMenuTemplate = [
   {
@@ -74,7 +75,7 @@ const createWindow = () => {
   autoUpdater.on('checking-for-update', () => {
     mainWindow.webContents.send('log', 'checking for update');
   });
-  
+
   autoUpdater.on('before-quit-for-update', () => {
     FolderMonitor.shutDownForUpdate();
   });
@@ -109,15 +110,17 @@ app.on('activate', () => {
  * File watcher logic
  */
 
-const FolderMonitor = require('./folderMonitor');
+// const FolderMonitor = require('./folderMonitor');
 
-FolderMonitor.events.on('report', function (report) {
-  mainWindow.webContents.send('update', report);
-});
+// FolderMonitor.events.on('report', function (report) {
+//   mainWindow.webContents.send('update', report);
+// });
 
-FolderMonitor.events.on('log', function (body) {
-  mainWindow.webContents.send('log', body);
-});
+// FolderMonitor.events.on('log', function (body) {
+//   mainWindow.webContents.send('log', body);
+// });
+
+const controller = require('./controller');
 
 /**
  * InterProcess Communication
@@ -126,11 +129,11 @@ FolderMonitor.events.on('log', function (body) {
 ipcMain.on('open-folder', function (event, arg) {
   // arg == 'input.local'
   const tp = arg.split('.');
-  FolderMonitor.openFolder({ el: tp[0], el2: tp[1] });
+  // FolderMonitor.openFolder({ el: tp[0], el2: tp[1] });
 });
 
 ipcMain.on('start-watcher', function (event, arg) {
-  FolderMonitor.start();
+  // FolderMonitor.start();
 });
 
 ipcMain.on('stop-watcher', function (event, arg) {

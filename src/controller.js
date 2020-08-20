@@ -1,7 +1,6 @@
-const ftp_hr_m4 = require('./jobFtphrm4');
-const database = require('./database');
+const ftp_hr_m4 = require('./lib/jobFtphrm4');
+const database = require('./lib/database');
 const db = new database();
-
 
 ftp_hr_m4.runme().then((data) => {
   // data = { jobs: [{ root, type, profile, name, path, todoNew, todoTaken, done }], images: [{ jobID, status, path }] }

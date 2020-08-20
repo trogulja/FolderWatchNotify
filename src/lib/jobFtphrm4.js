@@ -7,7 +7,7 @@ const jobDirectory = 'Q:\\_JOBS';
 class ftp_hr_m4 {
   static async runme() {
     // const data = await this.walk(jobDirectory);
-    const dataBuffer = await fs.readFile('output.json');
+    const dataBuffer = await fs.readFile(path.join(__dirname, 'output.json'));
     const data = JSON.parse(dataBuffer);
     const jobs = this.handleData(data);
     return jobs;
