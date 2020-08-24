@@ -7,8 +7,8 @@ class database {
   constructor() {
     this.db = new Database(path.join(paths.db, 'folderWatcher.db'));
     this.db.pragma('journal_mode = WAL');
-    this.db.prepare('CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, cID STRING, root STRING, type STRING, profile STRING, name STRING, todoNew INT, todoTaken INT, done INT, dueMS INT, updatedAtMS INT)').run();
-    this.db.prepare('CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, job REFERENCES jobs(id) ON DELETE CASCADE ON UPDATE CASCADE, status STRING, path STRING)').run();
+    this.db.prepare('CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY NOT NULL, cID STRING, root STRING, type STRING, profile STRING, name STRING, todoNew INT, todoTaken INT, done INT, dueMS INT, updatedAtMS INT)').run();
+    this.db.prepare('CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY NOT NULL, job REFERENCES jobs(id) ON DELETE CASCADE ON UPDATE CASCADE, status STRING, path STRING)').run();
 
     this.insertJob = this.db.prepare('INSERT INTO jobs (cID, root, type, profile, name, todoNew, todoTaken, done, dueMS, updatedAtMS) VALUES (@cID, @root, @type, @profile, @name, @todoNew, @todoTaken, @done, @dueMS, @updatedAtMS)');
     this.deleteJob = this.db.prepare('DELETE FROM jobs WHERE cID = @cID')

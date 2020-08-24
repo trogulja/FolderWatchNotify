@@ -28,9 +28,22 @@
 - /FCL/Wienerin/Wienerin_12_20_Nr.371/PRODUKTION/00_Bilder für Litho
 - => \_FERTIG, \_In Bearbeitung
 
-### Rapid
+### Rapid Fanartikelkatalog
 
-- /MCL/Rapid/Fanartikelkatalog
+- /MCL/Rapid/Fanartikelkatalog/Katalog Herbst2019/05_LITHO
+- => FERTIG, taken
+- /MCL/Rapid/Fanartikelkatalog/Katalog Herbst2018/05_LITHO
+- => Fertig, _taken
+- /MCL/Rapid/Fanartikelkatalog/Katalog Herbst2017/05_LITHO
+- => cutouts, Fanartikel, FERTIG, zu bearbeiten
+- /MCL/Rapid/Fanartikelkatalog/Katalog Sommer2017/05_LITHO
+- => Fertig
+- /MCL/Rapid/Fanartikelkatalog/Katalog Sommer2018/05_LITHO
+- => Fertig, Taken
+- /MCL/Rapid/Fanartikelkatalog/Katalog Sommer2019/05_LITHO
+- => _fertig, _taken, ...
+
+### Rapid Magazin
 - /MCL/Rapid/Rapid Magazin/Rapid Magazin_01-19/PRODUKTION/00_Bilder für Litho
 - /MCL/Rapid/Rapid Magazin/Rapid Magazin_01-20/PRODUKTION/00_Bilder für Litho
 - /MCL/Rapid/Rapid Magazin/Rapid Magazin_02-18/PRODUKTION/00_Bilder für Litho
@@ -42,7 +55,7 @@
 - /MCL/Rapid/Rapid Magazin/Rapid Magazin_05-19/PRODUKTION/00_Bilder für Litho
 - => \_FERTIG, \_In Bearbeitung
 
-### Sportmagazin
+### Sportmagazin - not included! ugasen?
 
 - /MCL/Sportmagazin/ÖPC 1-18/PRODUKTION/00_Bilder für Litho
 - /MCL/Sportmagazin/ÖPC 2-18/PRODUKTION/00_Bilder für Litho

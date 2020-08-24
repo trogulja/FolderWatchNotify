@@ -3,14 +3,15 @@ const path = require('path');
 const { findIndex } = require('lodash');
 const jobRoot = '\\\\srvczg-files\\ftp_hr_m4\\_JOBS\\';
 const jobDirectory = 'Q:\\_JOBS';
+const cID = 'ftp_hr_m4';
 
-class ftp_hr_m4 {
+class ShareController {
   static async runme() {
     // const data = await this.walk(jobDirectory);
     const dataBuffer = await fs.readFile(path.join(__dirname, 'output.json'));
     const data = JSON.parse(dataBuffer);
     const jobs = this.handleData(data);
-    return jobs;
+    return { ...jobs, cID };
   }
 
   static async walk(dir) {
@@ -152,7 +153,7 @@ class ftp_hr_m4 {
   }
 }
 
-module.exports = ftp_hr_m4;
+module.exports = ShareController;
 
 // ftp_hr_m4.runme().then((data) => {
 //   // data = { jobs: [{ root, type, profile, name, path, todoNew, todoTaken, done }], images: [{ jobID, status, path }] }

@@ -39,6 +39,6 @@ if (app === 'prod') {
 
 paths.db = path.join(paths.root, 'db');
 
-console.log(paths)
+// console.log(paths)
 
 module.exports = paths;
