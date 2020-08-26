@@ -353,6 +353,8 @@ class FTPControllerWien {
         } else {
           // we are deep enough to process all files
           pushIt = true;
+          // Ignore fertig, because it causes issues and long load times
+          if (thisclass.parseStatus.done.test(path.basename(file.path))) pushIt = false;
         }
 
         if (pushIt) {
