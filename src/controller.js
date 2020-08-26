@@ -31,6 +31,7 @@ function refreshDB(data) {
 }
 
 async function jobShares() {
+  console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\`)
   const share = await ShareController.runme();
   refreshDB(share);
   return true;
@@ -40,6 +41,7 @@ async function jobFTPs() {
   const jobs = ['monat', 'start', '7dnevno', 'emmezeta', 'opravdano'];
 
   for await (const job of jobs) {
+    console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: ${job}`)
     const dataRaw = new FTPController(job);
     const data = await dataRaw.runme();
     refreshDB(data);
@@ -49,18 +51,10 @@ async function jobFTPs() {
 }
 
 async function jobWien() {
-  const wienjobs = [
-    'diva',
-    'wienerin',
-    'rapidfak',
-    'rapidmagazin',
-    'corner',
-    'activebeauty',
-    'hub',
-    'va',
-  ];
+  const wienjobs = ['diva', 'wienerin', 'rapidfak', 'rapidmagazin', 'corner', 'activebeauty', 'hub', 'va'];
 
   for await (const job of wienjobs) {
+    console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: ${job}`)
     const dataRaw = new FTPControllerWien(job);
     const data = await dataRaw.runme();
     refreshDB(data);
@@ -142,28 +136,30 @@ function reportJobs() {
     .catch((err) => console.log(err));
 }
 
-cron.schedule('0 0,8-23 * * *', function () {
-  jobWien();
-});
+// cron.schedule('0 0,8-23 * * *', function () {
+//   jobWien();
+// });
 
-cron.schedule('10 0,8-23 * * *', function () {
-  jobFTPs();
-});
+// cron.schedule('10 0,8-23 * * *', function () {
+//   jobFTPs();
+// });
 
-cron.schedule('15 0,8-23 * * *', function () {
-  jobShares();
-});
+// cron.schedule('15 0,8-23 * * *', function () {
+//   jobShares();
+// });
 
-cron.schedule('0 7 * * *', function () {
-  jobsAll();
-});
+// cron.schedule('0 7 * * *', function () {
+//   jobsAll();
+// });
 
-cron.schedule('30 9,12,18 * * 1-5', function() {
-  // Weekday reports - 9:30, 12:30, 18:30
-  reportJobs();
-})
+// cron.schedule('30 9,12,18 * * 1-5', function() {
+//   // Weekday reports - 9:30, 12:30, 18:30
+//   reportJobs();
+// })
 
-cron.schedule('30 12,18 * * 0,6', function() {
-  // Weekend reports: 12:30, 18:30
-  reportJobs();
-})
+// cron.schedule('30 12,18 * * 0,6', function() {
+//   // Weekend reports: 12:30, 18:30
+//   reportJobs();
+// })
+
+jobsAll();
