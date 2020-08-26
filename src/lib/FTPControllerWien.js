@@ -389,10 +389,10 @@ class FTPControllerWien {
             } catch (error) {
               console.log('Error during ftp.connect - in readDir()');
               console.log(`${error.name} (${error.code}): ${error.message}`);
-              return false;
+              break;
             }
           }
-          return false;
+          continue;
         }
       }
 
