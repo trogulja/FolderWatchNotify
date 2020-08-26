@@ -1,8 +1,7 @@
+if (!process.env.LOADED) require('./config');
 const PromiseFTP = require('promise-ftp');
 const path = require('path');
 const ftp = new PromiseFTP();
-const paths = require('./pathHandler');
-if (!process.env.LOADED) require('dotenv').config({ path: path.join(paths.root, '.env') });
 
 const rules = {
   ftpOptions: {

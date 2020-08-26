@@ -1,59 +1,79 @@
+if (!process.env.LOADED) require('./config');
 const axios = require('axios');
 const database = require('./database');
 const db = new database();
 
-// db.
+function reportJobs() {
+  const newJobs = db.getNew();
 
+  const blocks = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          'Bok, robot zvan Robotko Njuškalić se prijavljuje na dužnost! Pronjuškao sam direktorije i našao ove otvorene stavke:\n\n *Lokacije koje sadrže nove poslove:*',
+      },
+    },
+    {
+      type: 'divider',
+    },
+  ];
 
-// axios
-//   .post(process.env.SLACK_WEBHOOK, {
-//     text: 'Nađeno je 12 foldera sa slikama koje nisu napravljene',
-//     blocks: [
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text:
-//             'Bok, robot zvan Robotko Njuškalić se prijavljuje na dužnost! Pronjuškao sam direktorije i našao ove otvorene stavke:\n\n *Lokacije koje sadrže nove poslove:*',
-//         },
-//       },
-//       {
-//         type: 'divider',
-//       },
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text:
-//             '*1355-2005-Antenne-Bundesliga-getty*\n\n:new: *12 novih slika* _(0 uzetih, 20 napravljenih)_\n\n_lokacija:_ \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\Others\\\n_refresh @_ *25.8.* - *21:15*',
-//         },
-//       },
-//       {
-//         type: 'divider',
-//       },
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text:
-//             '*1355-2005-Antenne-Bundesliga-getty*\n:new: *12 novih slika* _(0 uzetih, 20 napravljenih)_\n_lokacija:_ \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\Others\\\n:clock1: _refresh @_ *25.8.* - *21:15*',
-//         },
-//       },
-//       {
-//         type: 'divider',
-//       },
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text:
-//             '*1355-2005-Antenne-Bundesliga-getty*\n:new: *12 novih slika* _(0 uzetih, 20 napravljenih)_\n_lokacija:_ \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\Others\\\n:clock1: _refresh @_ *25.8.* - *21:15*',
-//         },
-//       },
-//       {
-//         type: 'divider',
-//       },
-//     ],
-//   })
-//   .then((res) => console.log(res.data))
-//   .catch((err) => console.log(err));
+  newJobs.forEach((job) => {
+    const txtNew =
+      job.todoNew > 4
+        ? 'novih slika'
+        : job.todoNew > 1
+        ? 'nove slike'
+        : job.todoNew > 0
+        ? 'nova slika'
+        : 'novih slika';
+    const txtTaken =
+      job.todoTaken > 4
+        ? 'uzetih'
+        : job.todoTaken > 1
+        ? 'uzete'
+        : job.todoTaken > 0
+        ? 'uzeta'
+        : 'uzetih';
+    const txtDone =
+      job.done > 4
+        ? 'napravljenih'
+        : job.done > 1
+        ? 'napravljene'
+        : job.done > 0
+        ? 'napravljena'
+        : 'napravljenih';
+    const date = new Date(job.updatedAtMS);
+    const dateDay = `${date.getDate()}.${date.getMonth() + 1}.`;
+    const dateHour = `${date.getHours()}:${date.getMinutes()}`;
+
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*${job.name}*\n\n:new: *${job.todoNew} ${txtNew}* _(${job.todoTaken} ${txtTaken}, ${job.done} ${txtDone})_\n\n_lokacija:_ ${job.root}\n_(status na dan ${dateDay} u ${dateHour} sati)_`,
+      },
+    });
+    blocks.push({ type: 'divider' });
+  });
+
+  const txtTotalPre =
+    newJobs.length > 4
+      ? 'Nađeno je'
+      : newJobs.length > 1
+      ? 'Nađena su'
+      : newJobs.length > 0
+      ? 'Nađen je'
+      : 'Nađeno je';
+  const txtTotalPost = newJobs.length > 1 ? 'foldera' : newJobs.length > 0 ? 'folder' : 'foldera';
+  const txtTotal = `${txtTotalPre} ${newJobs.length} ${txtTotalPost} sa slikama koje nisu napravljene.`;
+
+  axios
+    .post(process.env.SLACK_WEBHOOK, { text: txtTotal, blocks })
+    .then((res) => console.log(res.data))
+    .catch((err) => console.log(err));
+}
+
+reportJobs();

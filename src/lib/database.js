@@ -14,7 +14,7 @@ class database {
     this.deleteJob = this.db.prepare('DELETE FROM jobs WHERE cID = @cID')
     this.insertImage = this.db.prepare('INSERT INTO files (job, status, path) VALUES (@job, @status, @path)');
 
-    this.selectNew = this.db.prepare('SELECT * FROM jobs WHERE todoNew > 0 ORDER BY cID ASC;');
+    this.selectNew = this.db.prepare('SELECT root, type, profile, name, todoNew, todoTaken, done, updatedAtMS FROM jobs WHERE todoNew > 0 ORDER BY cID ASC');
 
     const thisclass = this;
     this.insertImages = this.db.transaction((images) => {
@@ -32,6 +32,10 @@ class database {
 
   addImages(images) {
     return this.insertImages(images);
+  }
+
+  getNew() {
+    return this.selectNew.all();
   }
 }
 
