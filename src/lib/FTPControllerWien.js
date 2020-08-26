@@ -354,7 +354,7 @@ class FTPControllerWien {
           // we are deep enough to process all files
           pushIt = true;
           // Ignore fertig, because it causes issues and long load times
-          if (thisclass.parseStatus.done.str.test(path.basename(file.path))) pushIt = false;
+          // if (thisclass.parseStatus.done.str.test(path.basename(file.path))) pushIt = false;
         }
 
         if (pushIt) {
@@ -376,7 +376,7 @@ class FTPControllerWien {
 
       for (let i = 0; i < 4; i++) {
         try {
-          files = await ftp.list(dir);
+          files = await ftp.listSafe(dir);
           if (files) break;
         } catch (error) {
           console.log(`readDir() ${error.name} (${error.code}): ${error.message}`);

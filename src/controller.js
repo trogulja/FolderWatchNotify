@@ -161,3 +161,4 @@ cron.schedule('30 12,18 * * 0,6', function() {
   // Weekend reports: 12:30, 18:30
   reportJobs();
 })
+jobWien();
