@@ -382,7 +382,7 @@ class FTPControllerWien {
             await ftp.end();
             try {
               const serverMessage = await ftp.connect(thisclass.ftpOptions);
-              console.log(this.cID, 'message:', serverMessage);
+              console.log(thisclass.cID, 'message:', serverMessage);
             } catch (error) {
               console.log('Error during ftp.connect - in readDir()');
               console.log(`${error.name} (${error.code}): ${error.message}`);
