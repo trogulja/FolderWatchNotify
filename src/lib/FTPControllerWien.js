@@ -378,6 +378,17 @@ class FTPControllerWien {
         } catch (error) {
           console.log(`readDir() ${error.name} (${error.code}): ${error.message}`);
           console.log(`readDir() retry #${i + 1} for ${dir}`);
+          if (error.code === 'ECONNRESET') {
+            await ftp.end();
+            try {
+              const serverMessage = await ftp.connect(this.ftpOptions);
+              console.log(this.cID, 'message:', serverMessage);
+            } catch (error) {
+              console.log('Error during ftp.connect - in readDir()');
+              console.log(`${error.name} (${error.code}): ${error.message}`);
+              return false;
+            }
+          }
           return false;
         }
       }
