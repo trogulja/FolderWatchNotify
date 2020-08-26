@@ -370,6 +370,7 @@ class FTPControllerWien {
 
     async function readDir(dir) {
       let files;
+      console.log(`Reading: ${dir}`)
 
       for (let i = 0; i < 4; i++) {
         try {
