@@ -381,7 +381,7 @@ class FTPControllerWien {
           if (error.code === 'ECONNRESET') {
             await ftp.end();
             try {
-              const serverMessage = await ftp.connect(this.ftpOptions);
+              const serverMessage = await ftp.connect(thisclass.ftpOptions);
               console.log(this.cID, 'message:', serverMessage);
             } catch (error) {
               console.log('Error during ftp.connect - in readDir()');
