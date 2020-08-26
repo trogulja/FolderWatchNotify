@@ -24,10 +24,17 @@ class Config {
   input(el) {
     return this.insertAll(el);
   }
+  
+  dispose() {
+    return this.db.close();
+  }
 }
 
-const config = new Config();
+let config = new Config();
 const conf = config.getAll();
 conf.forEach((c) => {
   process.env[c.key] = c.value;
 });
+
+config.dispose();
+config = null;
