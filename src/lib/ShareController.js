@@ -7,9 +7,9 @@ const cID = 'ftp_hr_m4';
 
 class ShareController {
   static async runme() {
-    const data = await this.walk(jobDirectory);
-    // const dataBuffer = await fs.readFile(path.join(__dirname, 'output.json'));
-    // const data = JSON.parse(dataBuffer);
+    // const data = await this.walk(jobDirectory);
+    const dataBuffer = await fs.readFile(path.join(__dirname, 'output.json'));
+    const data = JSON.parse(dataBuffer);
     const jobs = this.handleData(data);
     return { ...jobs, cID };
   }
@@ -103,7 +103,7 @@ class ShareController {
         if (frag.length <= 5) return { str: fullpath, err: 'ANTENNE file path length not 6+' };
       }
       return {
-        root: path.join(jobRoot, frag[2]),
+        root: path.join(jobRoot, frag[2], frag[3], frag[4]),
         type: frag[3],
         profile: 'Newspaper Coldset V5',
         name: frag[4],
@@ -126,9 +126,10 @@ class ShareController {
 
     const profile = frag[3] === 'heatset' ? frag[4] : 'Newspaper Coldset V5';
     const name = frag[3] === 'heatset' ? frag[5] : frag[4];
+    const pathSuffix = frag[3] === 'heatset' ? path.join(frag[3], frag[4], frag[5]) : path.join(frag[3], frag[4]);
 
     return {
-      root: path.join(jobRoot, frag[2]),
+      root: path.join(jobRoot, frag[2], pathSuffix),
       type: frag[3],
       profile,
       name,

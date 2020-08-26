@@ -51,7 +51,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/FCL/Diva`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'Diva',
@@ -91,7 +91,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/FCL/Wienerin`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'Wienerin',
@@ -116,7 +116,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/MCL/Rapid/Fanartikelkatalog`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'Rapid Fanartikelkatalog',
@@ -142,7 +142,7 @@ const rules = {
       done: { id: 7, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/MCL/Rapid/Rapid Magazin`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'Rapid Magazin',
@@ -167,7 +167,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/MCL/ÖFB/Corner`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'ÖFB Corner',
@@ -200,7 +200,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/SCP/Active Beauty`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'Active Beauty',
@@ -226,7 +226,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/SCP/hub-HKSÖL`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'HUB',
@@ -253,7 +253,7 @@ const rules = {
       done: { id: 6, str: new RegExp('FERTIG', 'i') },
     },
     job: {
-      root: `ftp://${process.env.FTP_WIENNA_HOST}/SCP/VA`,
+      root: `ftp://${process.env.FTP_WIENNA_HOST}`,
       type: 'heatset',
       profile: 'ISO Coated v2 300',
       name: 'VoestAlpine',
@@ -333,7 +333,7 @@ class FTPControllerWien {
               if (jobtime) if (nowtime - jobtime > 1.577e10) break;
 
               jobs.push({
-                root: file.path,
+                root: `${thisclass.jobTemplate.root}${file.path}`,
                 type: thisclass.jobTemplate.type,
                 profile: thisclass.jobTemplate.profile,
                 name: path.basename(file.path),
@@ -452,9 +452,10 @@ class FTPControllerWien {
   }
 
   matchJobFile(jobs, fullpath) {
+    const thisclass = this;
     let output = 0;
     jobs.forEach((job, i) => {
-      if (new RegExp(`^${job.root}`).test(fullpath)) output = i;
+      if (new RegExp(`^${job.root.replace(thisclass.jobTemplate.root, '')}`).test(fullpath)) output = i;
     });
     return output;
   }

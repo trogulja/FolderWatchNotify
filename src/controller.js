@@ -65,6 +65,7 @@ async function jobWien() {
 
 function reportJobs() {
   const newJobs = db.getNew();
+  if (!newJobs.length) return false;
 
   const blocks = [
     {
@@ -161,3 +162,4 @@ cron.schedule('30 12,18 * * 0,6', function() {
   // Weekend reports: 12:30, 18:30
   reportJobs();
 })
+jobWien();
