@@ -136,30 +136,28 @@ function reportJobs() {
     .catch((err) => console.log(err));
 }
 
-// cron.schedule('0 0,8-23 * * *', function () {
-//   jobWien();
-// });
+cron.schedule('0 0,8-23 * * *', function () {
+  jobWien();
+});
 
-// cron.schedule('10 0,8-23 * * *', function () {
-//   jobFTPs();
-// });
+cron.schedule('10 0,8-23 * * *', function () {
+  jobFTPs();
+});
 
-// cron.schedule('15 0,8-23 * * *', function () {
-//   jobShares();
-// });
+cron.schedule('15 0,8-23 * * *', function () {
+  jobShares();
+});
 
-// cron.schedule('0 7 * * *', function () {
-//   jobsAll();
-// });
+cron.schedule('0 7 * * *', function () {
+  jobsAll();
+});
 
-// cron.schedule('30 9,12,18 * * 1-5', function() {
-//   // Weekday reports - 9:30, 12:30, 18:30
-//   reportJobs();
-// })
+cron.schedule('30 9,12,18 * * 1-5', function() {
+  // Weekday reports - 9:30, 12:30, 18:30
+  reportJobs();
+})
 
-// cron.schedule('30 12,18 * * 0,6', function() {
-//   // Weekend reports: 12:30, 18:30
-//   reportJobs();
-// })
-
-jobsAll();
+cron.schedule('30 12,18 * * 0,6', function() {
+  // Weekend reports: 12:30, 18:30
+  reportJobs();
+})
