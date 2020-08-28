@@ -44,7 +44,8 @@ const createWindow = () => {
     defaultHeight: 580,
   });
 
-  const allowResize = environment === 'development' ? true : false;
+  // const allowResize = environment === 'development' ? true : false;
+  const allowResize = true;
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -91,6 +92,7 @@ app.on('ready', createWindow);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    controller.destroy();
     app.quit();
   }
 });
@@ -122,20 +124,35 @@ app.on('activate', () => {
 
 const controller = require('./controller');
 
+controller.events.on('log', function (msg) {
+  mainWindow.webContents.send('log', msg);
+});
+
+controller.events.on('info', function (msg) {
+  mainWindow.webContents.send('info', msg);
+});
+
+controller.events.on('meta', function (msg) {
+  mainWindow.webContents.send('meta', msg);
+});
+
 /**
  * InterProcess Communication
  */
 
-ipcMain.on('open-folder', function (event, arg) {
-  // arg == 'input.local'
-  const tp = arg.split('.');
-  // FolderMonitor.openFolder({ el: tp[0], el2: tp[1] });
+ipcMain.on('init-job', function (event, arg) {
+  controller.init();
+  controller.start();
 });
 
-ipcMain.on('start-watcher', function (event, arg) {
-  // FolderMonitor.start();
+ipcMain.on('start-job', function (event, arg) {
+  controller.start();
 });
 
-ipcMain.on('stop-watcher', function (event, arg) {
-  // disposeFolderWatcher();
+ipcMain.on('stop-job', function (event, arg) {
+  controller.stop();
+});
+
+ipcMain.on('force-start', function (event, arg) {
+  controller.forceStart(arg);
 });

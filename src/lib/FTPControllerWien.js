@@ -2,6 +2,7 @@ if (!process.env.LOADED) require('./config');
 const PromiseFTP = require('promise-ftp');
 const path = require('path');
 const ftp = new PromiseFTP();
+const { EventEmitter } = require('events');
 
 const rules = {
   ftpOptions: {
@@ -272,6 +273,7 @@ class FTPControllerWien {
     this.garbage = { directories: [], files: [], extensions: new Set(), indd: new Set() };
     this.jobTemplate = { ...rules[location].job };
     this.cID = `${rules.cID} / ${rules[location].job.name}`;
+    this.events = new EventEmitter();
   }
 
   async runme() {
@@ -285,10 +287,10 @@ class FTPControllerWien {
 
     try {
       const serverMessage = await ftp.connect(this.ftpOptions);
-      console.log(this.cID, 'message:', serverMessage);
+      thisclass.events.emit('info', `${this.cID} message: ${serverMessage}`);
     } catch (error) {
-      console.log('Error during ftp.connect - in walk()');
-      console.log(`${error.name} (${error.code}): ${error.message}`);
+      thisclass.events.emit('log', 'Error during ftp.connect - in FTPControllerWien.walk()');
+      thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
       return false;
     }
 
@@ -372,23 +374,23 @@ class FTPControllerWien {
 
     async function readDir(dir) {
       let files;
-      console.log(`Reading: ${dir}`)
+      thisclass.events.emit('info', `Reading: ${dir}`)
 
       for (let i = 0; i < 4; i++) {
         try {
           files = await ftp.listSafe(dir);
           if (files) break;
         } catch (error) {
-          console.log(`readDir() ${error.name} (${error.code}): ${error.message}`);
-          console.log(`readDir() retry #${i + 1} for ${dir}`);
+          thisclass.events.emit('log', `readDir() ${error.name} (${error.code}): ${error.message}`);
+          thisclass.events.emit('log', `readDir() retry #${i + 1} for ${dir}`);
           if (error.code === 'ECONNRESET') {
             await ftp.end();
             try {
               const serverMessage = await ftp.connect(thisclass.ftpOptions);
-              console.log(thisclass.cID, 'message:', serverMessage);
+              thisclass.events.emit('log', `${thisclass.cID} message: ${serverMessage}`);
             } catch (error) {
-              console.log('Error during ftp.connect - in readDir()');
-              console.log(`${error.name} (${error.code}): ${error.message}`);
+              thisclass.events.emit('log', 'Error during ftp.connect - in FTPControllerWien.readDir()');
+              thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
               break;
             }
           }
@@ -397,7 +399,7 @@ class FTPControllerWien {
       }
 
       if (!files) {
-        console.log(`readDir() failed permanently for ${dir}`);
+        thisclass.events.emit('log', `readDir() failed permanently for ${dir}`);
         return false;
       }
 

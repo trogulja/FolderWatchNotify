@@ -36,49 +36,146 @@ import { ipcRenderer } from 'electron';
 var app = new Vue({
   el: '#app',
   data: {
-    input: {
-      title: 'Slanje u Claro',
-      local: {
-        name: 'dti export',
-        value: 0,
+    default: {
+      status: {
+        stop: {
+          txt: 'Stopped',
+          class: 'badge badge-danger',
+        },
+        start: {
+          txt: 'Running',
+          class: 'badge badge-success',
+        },
       },
-      remote: {
-        name: 'claro in',
-        value: 0,
+      btnStart: {
+        stop: {
+          class: 'btn btn-success',
+        },
+        start: {
+          class: 'btn btn-secondary',
+        },
+      },
+      btnStop: {
+        stop: {
+          class: 'btn btn-secondary',
+        },
+        start: {
+          class: 'btn btn-danger',
+        },
       },
     },
-    output: {
-      title: 'Vraćanje iz Clara u DTI',
-      local: {
-        name: 'dti refresh',
-        value: 0,
-      },
-      remote: {
-        name: 'claro out',
-        value: 0,
-      },
+
+    statusTxt: 'Stopped',
+    statusClass: 'badge badge-danger',
+
+    btnStartTxt: 'Start',
+    btnStartClass: 'btn btn-secondary',
+
+    btnStopTxt: 'Stop',
+    btnStopClass: 'btn btn-danger',
+
+    btnShares: 'btn btn-secondary',
+    btnFtps: 'btn btn-secondary',
+    btnWien: 'btn btn-secondary',
+
+    running: false,
+
+    info: '',
+    log: [],
+  },
+  computed: {
+    showLog: function () {
+      let output = '';
+      let loglen = this.log.length;
+      this.log.forEach((line, i) => {
+        output = output + line;
+        if (i < loglen - 1) output = output + '<br />';
+      });
+      return output;
     },
   },
   methods: {
-    open: function (folder) {
-      if (!folder) return false;
-      ipcRenderer.send('open-folder', folder);
+    addLog: function (line) {
+      console.log('adding line to log', line);
+      console.log('status.txt', this.statusTxt);
+      this.log.unshift(line);
+      if (this.log.length > 10) this.log.pop();
+    },
+    handleMeta: function (x) {
+      // x.job == shares | ftps | wien
+      // x.status == start | error | done
+      let output = 'btn btn-secondary';
+      let job = 'btn' + x.job.charAt(0).toUpperCase() + x.job.slice(1);
+      if (x.status === 'start') {
+        output = 'btn btn-info';
+      } else if (x.status === 'error') {
+        output = 'btn btn-danger';
+      }
+
+      this[job] = output;
+    },
+    sendShares: function () {
+      if (this['btnShares'] === 'btn btn-info') return;
+      if (this['btnFtps'] === 'btn btn-info') return;
+      if (this['btnWien'] === 'btn btn-info') return;
+
+      ipcRenderer.send('force-start', 'shares');
+    },
+    sendFtps: function () {
+      if (this['btnShares'] === 'btn btn-info') return;
+      if (this['btnFtps'] === 'btn btn-info') return;
+      if (this['btnWien'] === 'btn btn-info') return;
+
+      ipcRenderer.send('force-start', 'ftps');
+    },
+    sendWien: function () {
+      if (this['btnShares'] === 'btn btn-info') return;
+      if (this['btnFtps'] === 'btn btn-info') return;
+      if (this['btnWien'] === 'btn btn-info') return;
+
+      ipcRenderer.send('force-start', 'wien');
+    },
+    sendStart: function () {
+      if (this.running) return;
+
+      ipcRenderer.send('start-job', 'start');
+      this.btnStartClass = this.default.btnStart.start.class;
+      this.btnStopClass = this.default.btnStop.start.class;
+      this.statusTxt = this.default.status.start.txt;
+      this.statusClass = this.default.status.start.class;
+      this.running = true;
+    },
+    sendStop: function () {
+      if (!this.running) return;
+
+      ipcRenderer.send('stop-job', 'stop');
+      this.btnStartClass = this.default.btnStart.stop.class;
+      this.btnStopClass = this.default.btnStop.stop.class;
+      this.statusTxt = this.default.status.stop.txt;
+      this.statusClass = this.default.status.stop.class;
+      this.running = false;
     },
   },
   mounted() {
-    ipcRenderer.send('start-watcher', 'init');
+    ipcRenderer.send('init-job', 'init');
+    this.btnStartClass = this.default.btnStart.start.class;
+    this.btnStopClass = this.default.btnStop.start.class;
+    this.statusTxt = this.default.status.start.txt;
+    this.statusClass = this.default.status.start.class;
+    this.info = this.default.status.start.txt;
+    this.running = true;
   },
 });
 
 // Set listeners for data change
-ipcRenderer.on('update', function (event, arg) {
-  ['input', 'output'].forEach((el) => {
-    ['local', 'remote'].forEach((el2) => {
-      app[el][el2].value = Number(arg[el][el2]);
-    });
-  });
+ipcRenderer.on('info', function (event, arg) {
+  app.info = arg;
 });
 
 ipcRenderer.on('log', function (event, arg) {
-  console.log(arg);
+  app.addLog(arg);
+});
+
+ipcRenderer.on('meta', function (event, arg) {
+  app.handleMeta(arg);
 });

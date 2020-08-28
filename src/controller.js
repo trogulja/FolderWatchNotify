@@ -1,11 +1,11 @@
 if (!process.env.LOADED) require('./lib/config');
 const database = require('./lib/database');
-const db = new database();
 const axios = require('axios');
 const FTPController = require('./lib/FTPController');
 const ShareController = require('./lib/ShareController');
 const FTPControllerWien = require('./lib/FTPControllerWien');
 const cron = require('node-cron');
+const { EventEmitter } = require('events');
 
 async function jobsAll() {
   await jobShares();
@@ -31,41 +31,101 @@ function refreshDB(data) {
 }
 
 async function jobShares() {
-  console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\`)
-  const share = await ShareController.runme();
-  refreshDB(share);
+  emitLog(`Collecting data for: \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\`);
+  emitMeta({ job: 'shares', status: 'start' });
+
+  const share = new ShareController();
+  share.events.on('log', function (msg) {
+    emitLog(msg);
+  });
+  share.events.on('info', function (msg) {
+    emitInfo(msg);
+  });
+
+  const data = await share.runme().catch((error) => false);
+  if (!data) {
+    emitMeta({ job: 'shares', status: 'error' });
+    return false;
+  }
+
+  refreshDB(data);
+  emitMeta({ job: 'shares', status: 'done' });
+  emitLog(`Collecting data done: \\\\srvczg-files\\ftp_hr_m4\\_JOBS\\`);
   return true;
 }
 
 async function jobFTPs() {
+  emitMeta({ job: 'ftps', status: 'start' });
   const jobs = ['monat', 'start', '7dnevno', 'emmezeta', 'opravdano'];
 
   for await (const job of jobs) {
-    console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: ${job}`)
+    emitLog(`Collecting data for: ${job}`);
+
     const dataRaw = new FTPController(job);
-    const data = await dataRaw.runme();
+    dataRaw.events.on('log', function (msg) {
+      emitLog(msg);
+    });
+    dataRaw.events.on('info', function (msg) {
+      emitInfo(msg);
+    });
+
+    const data = await dataRaw.runme().catch((error) => false);
+    if (!data) {
+      emitMeta({ job: 'ftps', status: 'error' });
+      return false;
+    }
+
     refreshDB(data);
+    emitLog(`Collecting data done: ${job}`);
   }
 
+  emitMeta({ job: 'ftps', status: 'done' });
   return true;
 }
 
 async function jobWien() {
-  const wienjobs = ['diva', 'wienerin', 'rapidfak', 'rapidmagazin', 'corner', 'activebeauty', 'hub', 'va'];
+  emitMeta({ job: 'wien', status: 'start' });
+  const wienjobs = [
+    'diva',
+    'wienerin',
+    'rapidfak',
+    'rapidmagazin',
+    'corner',
+    'activebeauty',
+    'hub',
+    'va',
+  ];
 
   for await (const job of wienjobs) {
-    console.log(`[${new Date().toTimeString().split(' ')[0]}] Collecting data for: ${job}`)
+    emitLog(`Collecting data for: ${job}`);
+
     const dataRaw = new FTPControllerWien(job);
-    const data = await dataRaw.runme();
+    dataRaw.events.on('log', function (msg) {
+      emitLog(msg);
+    });
+    dataRaw.events.on('info', function (msg) {
+      emitInfo(msg);
+    });
+
+    const data = await dataRaw.runme().catch((error) => false);
+    if (!data) {
+      emitMeta({ job: 'wien', status: 'error' });
+      return false;
+    }
+
     refreshDB(data);
+    emitLog(`Collecting data done: ${job}`);
   }
 
+  emitMeta({ job: 'wien', status: 'done' });
   return true;
 }
 
 function reportJobs() {
   const newJobs = db.getNew();
   if (!newJobs.length) return false;
+
+  emitLog(`Reporting to webhook ${newJobs.length} new jobs.`);
 
   const blocks = [
     {
@@ -137,28 +197,139 @@ function reportJobs() {
     .catch((err) => console.log(err));
 }
 
-cron.schedule('0 0,8-23 * * *', function () {
-  jobWien();
-});
+function emitLog(s) {
+  CronController.events.emit('log', `[${new Date().toTimeString().split(' ')[0]}] ${s}`);
+  console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${s}`);
+}
 
-cron.schedule('10 0,8-23 * * *', function () {
-  jobFTPs();
-});
+function emitInfo(s) {
+  CronController.events.emit('info', s);
+  console.log('emitting info:', s);
+}
 
-cron.schedule('15 0,8-23 * * *', function () {
-  jobShares();
-});
+function emitMeta(o) {
+  CronController.events.emit('meta', o);
+  console.log('emitting meta:');
+  console.log(o);
+}
 
-cron.schedule('0 7 * * *', function () {
-  jobsAll();
-});
+const cronjob = {};
+let db = null;
 
-cron.schedule('30 9,12,18 * * 1-5', function() {
-  // Weekday reports - 9:30, 12:30, 18:30
-  reportJobs();
-})
+class CronController {
+  static init() {
+    if (db) this.destroy();
 
-cron.schedule('30 12,18 * * 0,6', function() {
-  // Weekend reports: 12:30, 18:30
-  reportJobs();
-})
+    db = new database();
+    emitLog('Database connection opened.');
+
+    cronjob.wien = cron.schedule(
+      '0 0,8-23 * * *',
+      function () {
+        emitLog('Starting cronjob: wien');
+        jobWien();
+      },
+      { scheduled: false }
+    );
+
+    cronjob.ftps = cron.schedule(
+      '10 0,8-23 * * *',
+      function () {
+        emitLog('Starting cronjob: ftps');
+        jobFTPs();
+      },
+      { scheduled: false }
+    );
+
+    cronjob.shares = cron.schedule(
+      '15 0,8-23 * * *',
+      function () {
+        emitLog('Starting cronjob: shares');
+        jobShares();
+      },
+      { scheduled: false }
+    );
+
+    cronjob.all = cron.schedule(
+      '0 7 * * *',
+      function () {
+        emitLog('Starting cronjob: all');
+        jobsAll();
+      },
+      { scheduled: false }
+    );
+
+    cronjob.weekday = cron.schedule(
+      '30 9,12,18 * * 1-5',
+      function () {
+        // Weekday reports - 9:30, 12:30, 18:30
+        emitLog('Starting cronjob: Weekday reports');
+        reportJobs();
+      },
+      { scheduled: false }
+    );
+
+    cronjob.weekend = cron.schedule(
+      '30 12,18 * * 0,6',
+      function () {
+        // Weekend reports: 12:30, 18:30
+        emitLog('Starting cronjob: Weekend reports');
+        reportJobs();
+      },
+      { scheduled: false }
+    );
+    emitLog('Cronjobs installed.');
+  }
+
+  static start() {
+    cronjob.wien.start();
+    cronjob.ftps.start();
+    cronjob.shares.start();
+    cronjob.all.start();
+    cronjob.weekday.start();
+    cronjob.weekend.start();
+    emitLog('Cronjobs started.');
+  }
+
+  static stop() {
+    cronjob.wien.stop();
+    cronjob.ftps.stop();
+    cronjob.shares.stop();
+    cronjob.all.stop();
+    cronjob.weekday.stop();
+    cronjob.weekend.stop();
+    emitLog('Cronjobs stopped.');
+  }
+
+  static destroy() {
+    cronjob.wien.destroy();
+    cronjob.ftps.destroy();
+    cronjob.shares.destroy();
+    cronjob.all.destroy();
+    cronjob.weekday.destroy();
+    cronjob.weekend.destroy();
+    emitLog('Cronjobs destroyed.');
+    db.close();
+    db = null;
+    emitLog('Database connection closed.');
+  }
+
+  static runnow() {
+    jobsAll();
+  }
+
+  static forceStart(job) {
+    // job === shares | ftps | wien
+    if (job === 'shares') jobShares();
+    if (job === 'ftps') jobFTPs();
+    if (job === 'wien') jobWien();
+  }
+
+  static events = new EventEmitter();
+}
+
+module.exports = CronController;
+
+// CronController.init();
+// CronController.start();
+// CronController.runnow();

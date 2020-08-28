@@ -2,92 +2,48 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>FolderMonitor app v1.0.9</title>
+    <title>FolderWatchNotify app v1.0.0</title>
     <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <script src="js/bootstrap.min.js"></script> -->
   </head>
-  <body class="container-fluid w-100 m-0 p-0">
-    <div
-      class="vw-100 vh-100 d-flex flex-column align-items-center justify-content-center"
-      id="app"
-    >
-      <div class="w-100 d-flex flex-column p-5">
-        <div class="card mb-5">
-          <h5 class="card-header">{{ input.title }}</h5>
-          <!-- <button type="button" class="btn btn-warning" @click="stopwatching()">STOP!</button> -->
-          <!-- <button type="button" class="btn btn-success" @click="startwatching()">START</button> -->
-          <div class="card-body">
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="w-25 text-left">
-                  <button type="button" class="btn btn-warning" @click="open('input.local')">
-                    {{ input.local.value }}
-                  </button>
-                </span>
-                <span class="w-50 d-flex justify-content-between align-items-center">
-                  <span class="w-25 text-center">{{ input.local.name }}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="feather feather-chevrons-right text-warning"
+  <body class="w-100 m-0 p-0">
+    <div class="container-fluid">
+      <div class="w-100 d-flex flex-column align-items-start justify-content-center" id="app">
+        <div class="w-100 d-flex flex-column p-5">
+          <div class="card">
+            <div class="card-body">
+              <ul class="list-group">
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center container-log"
+                >
+                  <span class="text-left"
+                    >Status: <span :class="statusClass">{{statusTxt}}</span></span
                   >
-                    <polyline points="13 17 18 12 13 7"></polyline>
-                    <polyline points="6 17 11 12 6 7"></polyline>
-                  </svg>
-                  <span class="w-25 text-center">{{ input.remote.name }}</span>
-                </span>
-                <span class="w-25 text-right">
-                  <button type="button" class="btn btn-warning" @click="open('input.remote')">
-                    {{ input.remote.value }}
-                  </button>
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="card">
-          <h5 class="card-header text-right">{{ output.title }}</h5>
-          <div class="card-body">
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="w-25 text-left">
-                  <button type="button" class="btn btn-success" @click="open('output.local')">
-                    {{ output.local.value }}
-                  </button>
-                </span>
-                <span class="w-50 d-flex justify-content-between align-items-center">
-                  <span class="w-25 text-center">{{ output.local.name }}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="feather feather-chevrons-left text-success"
-                  >
-                    <polyline points="11 17 6 12 11 7"></polyline>
-                    <polyline points="18 17 13 12 18 7"></polyline>
-                  </svg>
-                  <span class="w-25 text-center">{{ output.remote.name }}</span>
-                </span>
-                <span class="w-25 text-right">
-                  <button type="button" class="btn btn-success" @click="open('output.remote')">
-                    {{ output.remote.value }}
-                  </button>
-                </span>
-              </li>
-            </ul>
+                  <div class="btn-group" role="group">
+                    <button type="button" :class="btnShares" @click="sendShares">shares</button>
+                    <button type="button" :class="btnFtps" @click="sendFtps">ftps</button>
+                    <button type="button" :class="btnWien" @click="sendWien">wien</button>
+                  </div>
+                  <div class="btn-group" role="group">
+                    <button type="button" :class="btnStartClass" @click="sendStart">
+                      {{ btnStartTxt }}
+                    </button>
+                    <button type="button" :class="btnStopClass" @click="sendStop">
+                      {{ btnStopTxt }}
+                    </button>
+                  </div>
+                </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center container-info"
+                >
+                  {{ info }}
+                </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center container-log"
+                  v-html="showLog"
+                ></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

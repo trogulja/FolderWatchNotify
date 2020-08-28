@@ -2,6 +2,7 @@ if (!process.env.LOADED) require('./config');
 const PromiseFTP = require('promise-ftp');
 const path = require('path');
 const ftp = new PromiseFTP();
+const { EventEmitter } = require('events');
 
 const rules = {
   monat: {
@@ -131,6 +132,7 @@ class FTPController {
     this.garbage = { directories: [], files: [], extensions: new Set(), indd: new Set() };
     this.jobs = [{ ...rules[location].job }];
     this.cID = rules[location].cID;
+    this.events = new EventEmitter();
   }
 
   async runme() {
@@ -144,9 +146,9 @@ class FTPController {
 
     try {
       const serverMessage = await ftp.connect(this.ftpOptions);
-      console.log(this.cID, 'message:', serverMessage);
+      thisclass.events.emit('info', `${this.cID} message: ${serverMessage}`);
     } catch (error) {
-      return console.log(`${error.name} (${error.code}): ${error.message}`);
+      return thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
     }
 
     async function walkDir(dir) {
@@ -159,7 +161,7 @@ class FTPController {
           if (ignore.test(file.path)) shouldIgnore = true;
         }
         if (shouldIgnore) {
-          console.log(`Ignoring ${file.path}`);
+          thisclass.events.emit('info', `Ignoring ${file.path}`);
         } else {
           output.push(file);
           if (file.type === 'directory') {

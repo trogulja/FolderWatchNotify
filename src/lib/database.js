@@ -37,6 +37,10 @@ class database {
   getNew() {
     return this.selectNew.all();
   }
+
+  close() {
+    return this.db.close();
+  }
 }
 
 module.exports = database;

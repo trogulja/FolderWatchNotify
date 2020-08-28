@@ -1,22 +1,36 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { findIndex } = require('lodash');
-const jobRoot = '\\\\srvczg-files\\ftp_hr_m4\\_JOBS\\';
-const jobDirectory = 'Q:\\_JOBS';
-const cID = 'ftp_hr_m4';
+const { EventEmitter } = require('events');
 
 class ShareController {
-  static async runme() {
-    const data = await this.walk(jobDirectory);
+  constructor() {
+    this.jobRoot = '\\\\srvczg-files\\ftp_hr_m4\\_JOBS\\';
+    this.jobDirectory = 'Q:\\_JOBS';
+    this.cID = 'ftp_hr_m4';
+    this.events = new EventEmitter();
+  }
+
+  async runme() {
+    const data = await this.walk(this.jobDirectory);
     // const dataBuffer = await fs.readFile(path.join(__dirname, 'output.json'));
     // const data = JSON.parse(dataBuffer);
     const jobs = this.handleData(data);
-    return { ...jobs, cID };
+    return { ...jobs, cID: this.cID };
   }
 
-  static async walk(dir) {
-    let files = await fs.readdir(dir);
+  async walk(dir) {
     const thisclass = this;
+    let files;
+    try {
+      files = await fs.readdir(dir);
+    } catch (error) {
+      thisclass.events.emit(
+        'log',
+        `ShareController.walk() ${error.name} (${error.code}): ${error.message}`
+      );
+      return false;
+    }
     files = await Promise.all(
       files.map(async (file) => {
         const filePath = path.join(dir, file);
@@ -30,7 +44,7 @@ class ShareController {
     ]);
   }
 
-  static handleData(data) {
+  handleData(data) {
     const directories = data.filter((el) => el.type === 'directory').map((el) => el.path);
     const files = data.filter((el) => el.type === 'file').map((el) => el.path);
     const garbage = { directories: [], files: [], extensions: new Set(), indd: new Set() };
@@ -81,7 +95,7 @@ class ShareController {
     return { jobs, images };
   }
 
-  static parsePath(fullpath, type) {
+  parsePath(fullpath, type) {
     // fulpath == Q:\_JOBS\Werbemarkt\heatset\ISO Coated v2 300\1436-2006-Dasein02 Bilder\TODO\something.psd
     // type    == file || directory
     const frag = fullpath.split(path.sep);
@@ -103,7 +117,7 @@ class ShareController {
         if (frag.length <= 5) return { str: fullpath, err: 'ANTENNE file path length not 6+' };
       }
       return {
-        root: path.join(jobRoot, frag[2], frag[3], frag[4]),
+        root: path.join(this.jobRoot, frag[2], frag[3], frag[4]),
         type: frag[3],
         profile: 'Newspaper Coldset V5',
         name: frag[4],
@@ -126,10 +140,11 @@ class ShareController {
 
     const profile = frag[3] === 'heatset' ? frag[4] : 'Newspaper Coldset V5';
     const name = frag[3] === 'heatset' ? frag[5] : frag[4];
-    const pathSuffix = frag[3] === 'heatset' ? path.join(frag[3], frag[4], frag[5]) : path.join(frag[3], frag[4]);
+    const pathSuffix =
+      frag[3] === 'heatset' ? path.join(frag[3], frag[4], frag[5]) : path.join(frag[3], frag[4]);
 
     return {
-      root: path.join(jobRoot, frag[2], pathSuffix),
+      root: path.join(this.jobRoot, frag[2], pathSuffix),
       type: frag[3],
       profile,
       name,
@@ -137,7 +152,7 @@ class ShareController {
     };
   }
 
-  static parseFileStatus(fullpath) {
+  parseFileStatus(fullpath) {
     // const todo = new RegExp('\\.?to.?do.?\\', 'i');
     // const todoDE = new RegExp('\\.?zu.?.?bearbeiten\\', 'i');
     const done = new RegExp('\\\\.?done\\\\', 'i');
@@ -152,6 +167,8 @@ class ShareController {
 
     return status;
   }
+
+  
 }
 
 module.exports = ShareController;
