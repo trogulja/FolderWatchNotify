@@ -26,6 +26,7 @@ const paths = { root: '', db: '' };
 let app = 'prod';
 if (process.execPath.search('electron.exe') >= 0) app = 'dev';
 if (process.execPath.search('node.exe') >= 0) app = 'test';
+if (process.execPath.search('AppData') >= 0) app = 'installed';
 
 if (app === 'prod') {
   paths.root = path.join(path.dirname(process.execPath), 'resources');
@@ -35,6 +36,8 @@ if (app === 'prod') {
   let frag = __dirname.split(path.sep);
   frag.length = frag.indexOf('src');
   paths.root = path.join(...frag);
+} else if (app === 'installed') {
+  paths.root = path.join(path.dirname(process.execPath), '..');
 }
 
 paths.db = path.join(paths.root, 'db');
