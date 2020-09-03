@@ -172,7 +172,7 @@ function reportJobs() {
         : 'napravljenih';
     const date = new Date(job.updatedAtMS);
     const dateDay = `${date.getDate()}.${date.getMonth() + 1}.`;
-    const dateHour = `${date.getHours()}:${date.getMinutes()}`;
+    const dateHour = `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
 
     blocks.push({
       type: 'section',
