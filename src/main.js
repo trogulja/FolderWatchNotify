@@ -71,14 +71,16 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-
+  
   // Testing autoupdater
   autoUpdater.on('checking-for-update', () => {
-    mainWindow.webContents.send('log', 'checking for update');
+    mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
   });
-
+  
   autoUpdater.on('before-quit-for-update', () => {
-    FolderMonitor.shutDownForUpdate();
+    mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Updating...`);
+    controller.destroy();
+    autoUpdater.quitAndInstall();
   });
 };
 

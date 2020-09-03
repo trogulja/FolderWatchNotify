@@ -1,5 +1,6 @@
 if (!process.env.LOADED) require('./lib/config');
 const database = require('./lib/database');
+const paths = require('./lib/pathHandler');
 const axios = require('axios');
 const FTPController = require('./lib/FTPController');
 const ShareController = require('./lib/ShareController');
@@ -42,11 +43,12 @@ async function jobShares() {
     emitInfo(msg);
   });
 
-  const data = await share.runme().catch((error) => false);
-  if (!data) {
+  const data = await share.runme().catch((error) => {
     emitMeta({ job: 'shares', status: 'error' });
+    emitLog(error.message || error);
     return false;
-  }
+  });
+  if (!data) return false;
 
   refreshDB(data);
   emitMeta({ job: 'shares', status: 'done' });
@@ -58,7 +60,7 @@ async function jobFTPs() {
   emitMeta({ job: 'ftps', status: 'start' });
   const jobs = ['monat', 'start', '7dnevno', 'emmezeta', 'opravdano'];
 
-  for await (const job of jobs) {
+  for (const job of jobs) {
     emitLog(`Collecting data for: ${job}`);
 
     const dataRaw = new FTPController(job);
@@ -69,11 +71,12 @@ async function jobFTPs() {
       emitInfo(msg);
     });
 
-    const data = await dataRaw.runme().catch((error) => false);
-    if (!data) {
+    const data = await dataRaw.runme().catch((error) => {
       emitMeta({ job: 'ftps', status: 'error' });
+      emitLog(error.message || error);
       return false;
-    }
+    });
+    if (!data) continue;
 
     refreshDB(data);
     emitLog(`Collecting data done: ${job}`);
@@ -96,7 +99,7 @@ async function jobWien() {
     'va',
   ];
 
-  for await (const job of wienjobs) {
+  for (const job of wienjobs) {
     emitLog(`Collecting data for: ${job}`);
 
     const dataRaw = new FTPControllerWien(job);
@@ -107,11 +110,12 @@ async function jobWien() {
       emitInfo(msg);
     });
 
-    const data = await dataRaw.runme().catch((error) => false);
-    if (!data) {
+    const data = await dataRaw.runme().catch((error) => {
       emitMeta({ job: 'wien', status: 'error' });
+      emitLog(error.message || error);
       return false;
-    }
+    });
+    if (!data) continue;
 
     refreshDB(data);
     emitLog(`Collecting data done: ${job}`);
@@ -278,6 +282,7 @@ class CronController {
       },
       { scheduled: false }
     );
+    emitLog(`Looking for db at: ${paths.db}`)
     emitLog('Cronjobs installed.');
   }
 

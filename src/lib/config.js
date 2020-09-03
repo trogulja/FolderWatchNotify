@@ -1,9 +1,11 @@
 const Database = require('better-sqlite3');
+const fs = require('fs');
 const path = require('path');
 const paths = require('./pathHandler');
 
 class Config {
   constructor() {
+    if (!fs.existsSync(paths.db)) fs.mkdirSync(paths.db);
     this.db = new Database(path.join(paths.db, 'fwConfig.db'));
     this.db.pragma('journal_mode = WAL');
     this.db.prepare('CREATE TABLE IF NOT EXISTS config (id INTEGER PRIMARY KEY NOT NULL, key STRING, value STRING)').run();

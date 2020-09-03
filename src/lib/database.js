@@ -1,10 +1,13 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const paths = require('./pathHandler');
+const fs = require('fs');
 // const db = new Database(path.join(paths.db, 'folderWatcher.db'), { verbose: console.log });
+console.log(paths);
 
 class database {
   constructor() {
+    if (!fs.existsSync(paths.db)) fs.mkdirSync(paths.db);
     this.db = new Database(path.join(paths.db, 'folderWatcher.db'));
     this.db.pragma('journal_mode = WAL');
     this.db.prepare('CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY NOT NULL, cID STRING, root STRING, type STRING, profile STRING, name STRING, todoNew INT, todoTaken INT, done INT, dueMS INT, updatedAtMS INT)').run();
