@@ -239,7 +239,7 @@ const rules = {
       {
         regexp: new RegExp('VA.(\\d{2}).?(\\d{2})[^/]+', 'i'),
         name: 'VoestAlpine',
-        sub: true,
+        nested: true,
         issue: 1,
         month: null,
         year: 2,
@@ -297,19 +297,32 @@ class FTPControllerWien {
     async function walkDir(dir) {
       let files = await readDir(dir);
       if (!files) return false;
-      const initialDepth = files.length
-        ? thisclass.jobnames.sub
-          ? files[0].path.split('/').length
-          : files[0].path.split('/').length - 1
-        : 0;
+      let initialDepth = files.length ? files[0].path.split('/').length - 1 : 0;
       const jobs = [];
       const output = [];
 
       for await (const file of files) {
-        const depth = file.path.split('/').length - 1;
+        const fileFrag = file.path.split('/');
+        const depth = fileFrag.length - 1;
         let pushIt = false;
+        let nested = false;
+        let hits = 0;
         // depth == init in normal cases, and depth -1 == init - when job can have subjobs
-        if (depth <= initialDepth) {
+        // deal with nested jobs
+        for (const job of thisclass.jobnames) {
+          if (!job.nested) continue;
+
+          fileFrag.forEach((frag) => {
+            if (job.regexp.test(frag)) hits += 1;
+          });
+
+          if (hits > 1) {
+            nested = true;
+            break;
+          }
+        }
+
+        if (depth === initialDepth || (nested && depth === initialDepth + 1)) {
           // search for jobnames and push them into files
           for (const job of thisclass.jobnames) {
             if (job.regexp.test(path.basename(file.path))) {
@@ -349,9 +362,13 @@ class FTPControllerWien {
               break;
             }
           }
-        } else if (thisclass.steps[depth]) {
+        } else if (thisclass.steps[depth] || (nested && thisclass.steps[depth - 1])) {
           // we have a required step for this depth, test it and if true, push into files
-          if (thisclass.steps[depth].test(path.basename(file.path))) pushIt = true;
+          if (nested) {
+            if (thisclass.steps[depth - 1].test(path.basename(file.path))) pushIt = true;
+          } else {
+            if (thisclass.steps[depth].test(path.basename(file.path))) pushIt = true;
+          }
         } else {
           // we are deep enough to process all files
           pushIt = true;
@@ -374,7 +391,7 @@ class FTPControllerWien {
 
     async function readDir(dir) {
       let files;
-      thisclass.events.emit('info', `Reading: ${dir}`)
+      thisclass.events.emit('info', `Reading: ${dir}`);
 
       for (let i = 0; i < 4; i++) {
         try {
@@ -389,7 +406,10 @@ class FTPControllerWien {
               const serverMessage = await ftp.connect(thisclass.ftpOptions);
               thisclass.events.emit('log', `${thisclass.cID} message: ${serverMessage}`);
             } catch (error) {
-              thisclass.events.emit('log', 'Error during ftp.connect - in FTPControllerWien.readDir()');
+              thisclass.events.emit(
+                'log',
+                'Error during ftp.connect - in FTPControllerWien.readDir()'
+              );
               thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
               break;
             }
@@ -457,7 +477,8 @@ class FTPControllerWien {
     const thisclass = this;
     let output = 0;
     jobs.forEach((job, i) => {
-      if (new RegExp(`^${job.root.replace(thisclass.jobTemplate.root, '')}`).test(fullpath)) output = i;
+      if (new RegExp(`^${job.root.replace(thisclass.jobTemplate.root, '')}`).test(fullpath))
+        output = i;
     });
     return output;
   }
