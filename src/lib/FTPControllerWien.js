@@ -491,12 +491,14 @@ class FTPControllerWien {
       if (this.parseStatus.taken.str.test(fullpath)) status = 'todoTaken';
     } else if (frag.length > this.parseStatus.taken.id) {
       if (this.parseStatus.taken.str.test(frag[this.parseStatus.taken.id])) status = 'todoTaken';
+      if (this.parseStatus.taken.str.test(frag[this.parseStatus.taken.id + 1])) status = 'todoTaken';
     }
 
     if (!this.parseStatus.done.id) {
       if (this.parseStatus.done.str.test(fullpath)) status = 'done';
     } else if (frag.length > this.parseStatus.done.id) {
       if (this.parseStatus.done.str.test(frag[this.parseStatus.done.id])) status = 'done';
+      if (this.parseStatus.done.str.test(frag[this.parseStatus.done.id + 1])) status = 'done';
     }
 
     return status;

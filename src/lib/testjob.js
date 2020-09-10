@@ -7,7 +7,7 @@ db = new database();
 
 async function jobWien() {
   console.log('data collection start');
-  const dataRaw = new FTPControllerWien('diva');
+  const dataRaw = new FTPControllerWien('va');
   dataRaw.events.on('log', function (msg) {
     console.log(msg);
   });
@@ -24,6 +24,8 @@ async function jobWien() {
   if (!data) {
     console.log('no data!');
   }
+
+  console.log(data);
 
   refreshDB(data);
   console.log('data collection done');
