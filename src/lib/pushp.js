@@ -1,5 +1,6 @@
 if (!process.env.LOADED) require('./config');
 const net = require('net');
+const { EventEmitter } = require('events');
 
 class Mlinar {
   constructor() {
@@ -16,46 +17,54 @@ class Mlinar {
     this.server = null;
     this.target = null;
     this.client = null;
+
+    this.events = new EventEmitter();
   }
 
   init() {
-    if (!process.env.MLINAR_ACTIVE) return this.destroy();
+    if (!process.env.MLINAR_ACTIVE) {
+      this.events.emit('log', 'No config, exiting...')
+      return this.destroy();
+    }
 
     const thc = this;
     this.server = net
       .createServer((from) => {
-        thc.target = net.createConnection({ host: thc.toHost, port: thc.toPort }).on('error', (error) => {
-          thc.server.close();
-          thc.client.end();
-          thc.target.end();
-          console.log('conn error, we are rebooting!')
-          thc.init();
-        });
+        thc.target = net
+          .createConnection({ host: thc.toHost, port: thc.toPort })
+          .on('error', (error) => {
+            thc.server.close();
+            thc.client.end();
+            thc.target.end();
+            thc.events.emit('log', 'conn error, we are rebooting!');
+            thc.init();
+          });
         from.pipe(thc.target);
         thc.target.pipe(from);
       })
       .listen(thc.fromPort, thc.fromHost, () => {
-        console.log(`Server listening on port ${thc.fromPort}`);
+        thc.events.emit('log', `Server listening on port ${thc.fromPort}`);
         thc.server.maxConnections = 1;
       });
 
     this.server.on('error', (error) => {
-      console.log(
+      thc.events.emit(
+        'log',
         `Server caused an error code: ${error.code}, errno: ${error.errno}, syscall: ${error.syscall}, address: ${error.address}, port: ${error.port}`
       );
     });
     this.server.on('connection', (socket) => {
       thc.client = socket;
       thc.client.on('error', () => {
-        console.log('Client connection error occured, disconnecting...');
+        thc.events.emit('log', 'Client connection error occured, disconnecting...');
       });
       thc.client.on('close', () => {
-        console.log('Client disconnected!');
+        thc.events.emit('log', 'Client disconnected!');
       });
-      console.log('New client connected!');
+      thc.events.emit('log', 'New client connected!');
     });
     this.server.on('close', () => {
-      console.log('Server connection is closed!');
+      thc.events.emit('log', 'Server connection is closed!');
     });
   }
 

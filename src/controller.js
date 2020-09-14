@@ -227,6 +227,9 @@ class CronController {
     if (db) this.destroy();
 
     mlin = new Mlinar();
+    mlin.events.on('log', function (msg) {
+      emitLog(msg);
+    });
     db = new database();
     emitLog('Database connection opened.');
 
@@ -285,7 +288,7 @@ class CronController {
       },
       { scheduled: false }
     );
-    emitLog(`Looking for db at: ${paths.db}`)
+    emitLog(`Looking for db at: ${paths.db}`);
     emitLog('Cronjobs installed.');
   }
 
