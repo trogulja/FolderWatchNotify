@@ -7,6 +7,7 @@ const ShareController = require('./lib/ShareController');
 const FTPControllerWien = require('./lib/FTPControllerWien');
 const cron = require('node-cron');
 const { EventEmitter } = require('events');
+const Mlinar = require('./lib/pushp');
 
 async function jobsAll() {
   await jobShares();
@@ -219,16 +220,18 @@ function emitMeta(o) {
 
 const cronjob = {};
 let db = null;
+let mlin = null;
 
 class CronController {
   static init() {
     if (db) this.destroy();
 
+    mlin = new Mlinar();
     db = new database();
     emitLog('Database connection opened.');
 
     cronjob.wien = cron.schedule(
-      '0 0,8-23 * * *',
+      '20,50 0,8-23 * * *',
       function () {
         emitLog('Starting cronjob: wien');
         jobWien();
@@ -237,7 +240,7 @@ class CronController {
     );
 
     cronjob.ftps = cron.schedule(
-      '10 0,8-23 * * *',
+      '10,40 0,8-23 * * *',
       function () {
         emitLog('Starting cronjob: ftps');
         jobFTPs();
@@ -246,7 +249,7 @@ class CronController {
     );
 
     cronjob.shares = cron.schedule(
-      '15 0,8-23 * * *',
+      '15,45 0,8-23 * * *',
       function () {
         emitLog('Starting cronjob: shares');
         jobShares();
@@ -264,9 +267,9 @@ class CronController {
     );
 
     cronjob.weekday = cron.schedule(
-      '30 9,12,18 * * 1-5',
+      '0 9,12,18 * * 1-5',
       function () {
-        // Weekday reports - 9:30, 12:30, 18:30
+        // Weekday reports - 9:00, 12:00, 18:00
         emitLog('Starting cronjob: Weekday reports');
         reportJobs();
       },
@@ -313,6 +316,7 @@ class CronController {
     cronjob.all.destroy();
     cronjob.weekday.destroy();
     cronjob.weekend.destroy();
+    mlin.destroy();
     emitLog('Cronjobs destroyed.');
     db.close();
     db = null;

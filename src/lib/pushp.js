@@ -1,39 +1,26 @@
+if (!process.env.LOADED) require('./config');
 const net = require('net');
-// const loc = {
-//   from: { host: 'srvczg-pamendo', port: '4444' },
-//   to: { host: 'aardmud.org', port: '4444' }
-// };
-const loc = {
-  from: { host: 'localhost', port: 8125 },
-  to: { host: 'localhost', port: 10337 },
-};
-
-// if (!addr.from || !addr.to) {
-//     console.log('Usage: <from> <to>');
-//     return;
-// }
 
 class Mlinar {
   constructor() {
-    // this.fromHost = 'srvczg-pamendo'
-    // this.fromPort = 4444
-    // this.toHost = 'aardmud.org'
-    // this.toPort = 4444
+    // this.fromHost = process.env.MLINAR_FROM_HOST;
+    // this.fromPort = process.env.MLINAR_FROM_PORT;
+    // this.toHost = process.env.MLINAR_TO_HOST;
+    // this.toPort = process.env.MLINAR_TO_PORT;
 
     this.fromHost = 'localhost';
-    this.fromPort = 8215;
+    this.fromPort = 8125;
     this.toHost = 'localhost';
-    this.toPort = 10337;
+    this.toPort = 8126;
 
     this.server = null;
     this.target = null;
     this.client = null;
-
-    this.from = { host: 'localhost', port: 8125 };
-    this.to = { host: 'localhost', port: 10337 };
   }
 
   init() {
+    if (!process.env.MLINAR_ACTIVE) return this.destroy();
+
     const thc = this;
     this.server = net
       .createServer((from) => {
@@ -72,10 +59,18 @@ class Mlinar {
     });
   }
 
-  restart() {
+  destroy() {
+    if (this.server) this.server.close();
+    if (this.client) this.client.end();
+    if (this.target) this.target.end();
 
+    this.server = null;
+    this.client = null;
+    this.target = null;
   }
 }
+
+module.exports = Mlinar;
 
 // net
 //   .createServer((socket) => {
