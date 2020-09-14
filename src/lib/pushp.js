@@ -4,20 +4,20 @@ const { EventEmitter } = require('events');
 
 class Mlinar {
   constructor() {
-    // this.fromHost = process.env.MLINAR_FROM_HOST;
-    // this.fromPort = process.env.MLINAR_FROM_PORT;
-    // this.toHost = process.env.MLINAR_TO_HOST;
-    // this.toPort = process.env.MLINAR_TO_PORT;
-
-    this.fromHost = 'localhost';
-    this.fromPort = 8125;
-    this.toHost = 'localhost';
-    this.toPort = 8126;
-
+    this.fromHost = process.env.MLINAR_FROM_HOST;
+    this.fromPort = process.env.MLINAR_FROM_PORT;
+    this.toHost = process.env.MLINAR_TO_HOST;
+    this.toPort = process.env.MLINAR_TO_PORT;
+  
+    // this.fromHost = 'localhost';
+    // this.fromPort = 4444;
+    // this.toHost = 'localhost';
+    // this.toPort = 8251;
+  
     this.server = null;
     this.target = null;
     this.client = null;
-
+  
     this.events = new EventEmitter();
   }
 
@@ -48,6 +48,7 @@ class Mlinar {
       });
 
     this.server.on('error', (error) => {
+      thc.events.emit('log', `Failed connection from ${thc.fromHost}:${thc.fromPort} to ${thc.toHost}:${thc.toPort}`);
       thc.events.emit(
         'log',
         `Server caused an error code: ${error.code}, errno: ${error.errno}, syscall: ${error.syscall}, address: ${error.address}, port: ${error.port}`
@@ -98,6 +99,3 @@ module.exports = Mlinar;
 //     // console.log('The client has disconnected...\n');
 //   })
 //   .listen(10337, 'localhost');
-
-const mlin = new Mlinar();
-mlin.init();

@@ -7,7 +7,6 @@ const ShareController = require('./lib/ShareController');
 const FTPControllerWien = require('./lib/FTPControllerWien');
 const cron = require('node-cron');
 const { EventEmitter } = require('events');
-const Mlinar = require('./lib/pushp');
 
 async function jobsAll() {
   await jobShares();
@@ -220,16 +219,11 @@ function emitMeta(o) {
 
 const cronjob = {};
 let db = null;
-let mlin = null;
 
 class CronController {
   static init() {
     if (db) this.destroy();
 
-    mlin = new Mlinar();
-    mlin.events.on('log', function (msg) {
-      emitLog(msg);
-    });
     db = new database();
     emitLog('Database connection opened.');
 
@@ -319,7 +313,6 @@ class CronController {
     cronjob.all.destroy();
     cronjob.weekday.destroy();
     cronjob.weekend.destroy();
-    mlin.destroy();
     emitLog('Cronjobs destroyed.');
     db.close();
     db = null;
