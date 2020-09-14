@@ -90,3 +90,6 @@ out/
 
 # Database
 db/
+
+# VScode debug specifics
+.vscode/launch.json
