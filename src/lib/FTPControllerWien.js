@@ -461,10 +461,17 @@ class FTPControllerWien {
 
     const newImages = images.filter((el) => {
       let res = true;
-      thisclass.garbage.indd.forEach((e) => {
-        if (!res) return;
-        if (new RegExp(e.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).test(el.path)) res = false;
-      });
+      const file = path.basename(el.path);
+      const ext = path.extname(el.path).toLowerCase();
+      if (ext === 'pdf') {
+        thisclass.garbage.indd.forEach((e) => {
+          if (!res) return;
+          if (new RegExp(e.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).test(file)) {
+            res = false;
+            thisclass.garbage.files.push({ str: el.path, err: `indesign file matched => "${e}" with "${file}"!` });
+          }
+        });
+      }
       return res;
     });
 
@@ -491,7 +498,8 @@ class FTPControllerWien {
       if (this.parseStatus.taken.str.test(fullpath)) status = 'todoTaken';
     } else if (frag.length > this.parseStatus.taken.id) {
       if (this.parseStatus.taken.str.test(frag[this.parseStatus.taken.id])) status = 'todoTaken';
-      if (this.parseStatus.taken.str.test(frag[this.parseStatus.taken.id + 1])) status = 'todoTaken';
+      if (this.parseStatus.taken.str.test(frag[this.parseStatus.taken.id + 1]))
+        status = 'todoTaken';
     }
 
     if (!this.parseStatus.done.id) {

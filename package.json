@@ -1,7 +1,7 @@
 {
   "name": "folderwatchnotify",
   "productName": "FolderWatchNotify",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Watches for new files and reports!",
   "repository": {
     "type": "git",
@@ -25,7 +25,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "./src/img/lamp.ico"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -93,7 +95,7 @@
   },
   "dependencies": {
     "axios": "^0.20.0",
-    "better-sqlite3": "^7.1.0",
+    "better-sqlite3": "^7.1.1",
     "chokidar": "3.1.1",
     "cron": "^1.8.2",
     "electron-squirrel-startup": "^1.0.0",

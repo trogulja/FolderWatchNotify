@@ -59,6 +59,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
     },
+    icon: __dirname + '/img/lamp.ico'
   });
 
   mainWindowState.manage(mainWindow);

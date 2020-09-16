@@ -7,12 +7,13 @@ db = new database();
 
 async function jobWien() {
   console.log('data collection start');
-  const dataRaw = new FTPControllerWien('va');
+  const dataRaw = new FTPControllerWien('diva');
   dataRaw.events.on('log', function (msg) {
     console.log(msg);
   });
   dataRaw.events.on('info', function (msg) {
-    console.log(msg);
+    process.stdout.write('.')
+    // console.log(msg);
   });
 
   const data = await dataRaw.runme().catch((error) => {
@@ -25,7 +26,8 @@ async function jobWien() {
     console.log('no data!');
   }
 
-  console.log(data);
+  // console.log(data.jobs);
+  console.log(dataRaw.garbage.files);
 
   refreshDB(data);
   console.log('data collection done');
