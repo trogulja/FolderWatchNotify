@@ -277,7 +277,8 @@ class FTPControllerWien {
   }
 
   async runme() {
-    const dataRaw = await this.walk();
+    let dataRaw = await this.walk();
+    if (dataRaw === false) dataRaw = await this.walk();
     const data = this.handleData(dataRaw);
     return data;
   }
@@ -291,6 +292,8 @@ class FTPControllerWien {
     } catch (error) {
       thisclass.events.emit('log', 'Error during ftp.connect - in FTPControllerWien.walk()');
       thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
+      if (ftp.getConnectionStatus() === 'connected') ftp.destroy();
+      if (ftp.getConnectionStatus() === 'connecting') ftp.destroy();
       return false;
     }
 
