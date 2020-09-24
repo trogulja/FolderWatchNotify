@@ -113,6 +113,7 @@ async function jobWien() {
     const data = await dataRaw.runme().catch((error) => {
       emitMeta({ job: 'wien', status: 'error' });
       emitLog(error.message || error);
+      dataRaw.destroy();
       return false;
     });
     if (!data) continue;

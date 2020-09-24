@@ -517,6 +517,10 @@ class FTPControllerWien {
 
     return status;
   }
+
+  destroy() {
+    return ftp.destroy();
+  }
 }
 
 module.exports = FTPControllerWien;
