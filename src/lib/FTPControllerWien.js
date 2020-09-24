@@ -404,7 +404,7 @@ class FTPControllerWien {
           thisclass.events.emit('log', `readDir() ${error.name} (${error.code}): ${error.message}`);
           thisclass.events.emit('log', `readDir() retry #${i + 1} for ${dir}`);
           if (error.code === 'ECONNRESET') {
-            await ftp.end();
+            ftp.destroy();
             try {
               const serverMessage = await ftp.connect(thisclass.ftpOptions);
               thisclass.events.emit('log', `${thisclass.cID} message: ${serverMessage}`);
@@ -416,8 +416,11 @@ class FTPControllerWien {
               thisclass.events.emit('log', `${error.name} (${error.code}): ${error.message}`);
               break;
             }
+            continue;
+          } else {
+            ftp.destroy();
+            break;
           }
-          continue;
         }
       }
 
