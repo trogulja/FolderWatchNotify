@@ -62,6 +62,13 @@ const rules = {
     ftpEntry: '/FCL/Wienerin',
     jobnames: [
       {
+        regexp: new RegExp('Kochzeitung.(\\d+).(\\d+)', 'i'),
+        name: 'Kochzeitung',
+        issue: 1,
+        month: null,
+        year: 2,
+      },
+      {
         regexp: new RegExp('spar.mahlzeit.(\\d+).(\\d+)', 'i'),
         name: 'Spar Mahlzeit',
         issue: 1,
