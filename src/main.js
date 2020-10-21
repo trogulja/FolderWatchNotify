@@ -13,7 +13,7 @@ require('update-electron-app')();
 
 // Auto SET ENV - when deployed, paths change somewhat
 if (process.execPath.search('electron.exe') !== -1) environment = 'development';
-if (environment === 'development') require('dotenv').config();
+// if (environment === 'development') require('dotenv').config();
 
 const mainMenuTemplate = [
   {

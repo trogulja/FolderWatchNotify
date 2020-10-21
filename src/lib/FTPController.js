@@ -1,7 +1,9 @@
 if (!process.env.LOADED) require('./config');
 const PromiseFTP = require('promise-ftp');
+const PromiseSFTP = require('promise-sftp');
 const path = require('path');
-const ftp = new PromiseFTP();
+const ftp_regular = new PromiseFTP();
+const ftp_secure = new PromiseSFTP();
 const { EventEmitter } = require('events');
 
 const rules = {
@@ -120,6 +122,30 @@ const rules = {
     },
     cID: 'ftp_opravdano',
   },
+  kammerzeitung: {
+    ftpOptions: {
+      host: process.env.FTP_KAMMERZEITUNG_HOST,
+      user: process.env.FTP_KAMMERZEITUNG_USER,
+      password: process.env.FTP_KAMMERZEITUNG_PASS,
+      secure: true,
+    },
+    ftpIgnores: [new RegExp('arhiva', 'i')],
+    ftpEntry: '/EBV',
+    parseStatus: {
+      taken: { id: 3, str: new RegExp('taken', 'i') },
+      done: { id: 2, str: new RegExp('done', 'i') },
+    },
+    job: {
+      root: `ftp://${process.env.FTP_KAMMERZEITUNG_USER}@${process.env.FTP_KAMMERZEITUNG_HOST}/EBV`,
+      type: 'coldset',
+      profile: 'Newspaper Coldset V5',
+      name: 'Kammerzeitung',
+      todoNew: 0,
+      todoTaken: 0,
+      done: 0,
+    },
+    cID: 'ftp_kammerzeitung',
+  },
 };
 
 class FTPController {
@@ -143,6 +169,7 @@ class FTPController {
 
   async walk() {
     const thisclass = this;
+    const ftp = this.ftpOptions.secure ? ftp_secure : ftp_regular;
 
     try {
       const serverMessage = await ftp.connect(this.ftpOptions);

@@ -57,8 +57,9 @@ async function jobShares() {
 }
 
 async function jobFTPs() {
+  // console.log(process.env)
   emitMeta({ job: 'ftps', status: 'start' });
-  const jobs = ['monat', 'start', '7dnevno', 'emmezeta', 'opravdano'];
+  const jobs = ['monat', 'start', '7dnevno', 'emmezeta', 'opravdano', 'kammerzeitung'];
 
   for (const job of jobs) {
     emitLog(`Collecting data for: ${job}`);
