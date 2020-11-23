@@ -222,6 +222,12 @@ function emitMeta(o) {
 const cronjob = {};
 let db = null;
 
+// new crontab
+// every 5 minutes during mon-fri working hours
+// */5 0,9-23 * * 1-5 test >/dev/null 2>&1
+// every 5 minutes during weekend working hours
+// */5 0,11-23 * * 0,6 test >/dev/null 2>&1
+
 class CronController {
   static init() {
     if (db) this.destroy();

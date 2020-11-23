@@ -96,7 +96,7 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     controller.destroy();
-    mlin.destroy();
+    // mlin.destroy();
     app.quit();
   }
 });
@@ -127,12 +127,12 @@ app.on('activate', () => {
 // });
 
 const controller = require('./controller');
-const Mlinar = require('./lib/pushp');
-const mlin = new Mlinar();
-mlin.events.on('log', function (msg) {
-  mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
-  console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
-});
+// const Mlinar = require('./lib/pushp');
+// const mlin = new Mlinar();
+// mlin.events.on('log', function (msg) {
+//   mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
+//   console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
+// });
 
 
 controller.events.on('log', function (msg) {
@@ -154,7 +154,7 @@ controller.events.on('meta', function (msg) {
 ipcMain.on('init-job', function (event, arg) {
   controller.init();
   controller.start();
-  mlin.init();
+  // mlin.init();
 });
 
 ipcMain.on('start-job', function (event, arg) {
