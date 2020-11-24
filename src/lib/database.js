@@ -10,14 +10,14 @@ class database {
     if (!fs.existsSync(paths.db)) fs.mkdirSync(paths.db);
     this.db = new Database(path.join(paths.db, 'folderWatcher.db'));
     this.db.pragma('journal_mode = WAL');
-    this.db.prepare('CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY NOT NULL, cID STRING, root STRING, type STRING, profile STRING, name STRING, todoNew INT, todoTaken INT, done INT, dueMS INT, updatedAtMS INT)').run();
+    this.db.prepare('CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY NOT NULL, cID STRING, root STRING, type STRING, profile STRING, name STRING, todoNew INT, todoTaken INT, done INT, dueMS INT, repeat STRING, updatedAtMS INT)').run();
     this.db.prepare('CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY NOT NULL, job REFERENCES jobs(id) ON DELETE CASCADE ON UPDATE CASCADE, status STRING, path STRING)').run();
 
-    this.insertJob = this.db.prepare('INSERT INTO jobs (cID, root, type, profile, name, todoNew, todoTaken, done, dueMS, updatedAtMS) VALUES (@cID, @root, @type, @profile, @name, @todoNew, @todoTaken, @done, @dueMS, @updatedAtMS)');
+    this.insertJob = this.db.prepare('INSERT INTO jobs (cID, root, type, profile, name, todoNew, todoTaken, done, dueMS, repeat, updatedAtMS) VALUES (@cID, @root, @type, @profile, @name, @todoNew, @todoTaken, @done, @dueMS, @repeat, @updatedAtMS)');
     this.deleteJob = this.db.prepare('DELETE FROM jobs WHERE cID = @cID')
     this.insertImage = this.db.prepare('INSERT INTO files (job, status, path) VALUES (@job, @status, @path)');
 
-    this.selectNew = this.db.prepare('SELECT root, type, profile, name, todoNew, todoTaken, done, updatedAtMS FROM jobs WHERE todoNew > 0 ORDER BY cID ASC');
+    this.selectNew = this.db.prepare('SELECT root, type, profile, name, todoNew, todoTaken, done, repeat, updatedAtMS FROM jobs WHERE todoNew > 0 ORDER BY cID ASC');
 
     const thisclass = this;
     this.insertImages = this.db.transaction((images) => {
