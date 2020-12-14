@@ -49,7 +49,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|_In Bearbeitung$') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -96,7 +96,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|_In Bearbeitung$') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -121,7 +121,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -147,7 +147,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 7, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 7, str: new RegExp('FERTIG', 'i') },
+      done: { id: 7, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -172,7 +172,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -205,7 +205,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -231,7 +231,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -258,7 +258,7 @@ const rules = {
     },
     parseStatus: {
       taken: { id: 6, str: new RegExp('_[A-Z]{2}$|(?:B|b)earbeit(?:en|ung)|(?:T|t)aken|TAKEN') },
-      done: { id: 6, str: new RegExp('FERTIG', 'i') },
+      done: { id: 6, str: new RegExp('FERTIG|DONE', 'i') },
     },
     job: {
       root: `ftp://${process.env.FTP_WIENNA_HOST}`,
@@ -405,7 +405,7 @@ class FTPControllerWien {
 
       for (let i = 0; i < 4; i++) {
         try {
-          files = await ftp.listSafe(dir);
+          files = await ftp.listSafe(dir, false);
           if (files) break;
         } catch (error) {
           thisclass.events.emit('log', `readDir() ${error.name} (${error.code}): ${error.message}`);

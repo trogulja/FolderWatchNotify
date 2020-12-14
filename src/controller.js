@@ -318,7 +318,7 @@ class CronController {
     );
 
     cronjob.weekday = cron.schedule(
-      '4,9,14,19,24,29,34,39,44,49,54,59 0,9-23 * * 1-5',
+      '4,9,14,19,24,29,34,39,44,49,54,59 0,8-23 * * 1-5',
       function () {
         // Weekday reports - 9:00, 12:00, 18:00
         reportJobs();
@@ -327,7 +327,7 @@ class CronController {
     );
 
     cronjob.weekend = cron.schedule(
-      '4,9,14,19,24,29,34,39,44,49,54,59 0,11-23 * * 0,6',
+      '4,9,14,19,24,29,34,39,44,49,54,59 0,10-23 * * 0,6',
       function () {
         // Weekend reports: 12:30, 18:30
         reportJobs();

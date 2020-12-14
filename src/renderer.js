@@ -99,7 +99,7 @@ var app = new Vue({
       console.log('adding line to log', line);
       console.log('status.txt', this.statusTxt);
       this.log.unshift(line);
-      if (this.log.length > 10) this.log.pop();
+      if (this.log.length > 50) this.log.pop();
     },
     handleMeta: function (x) {
       // x.job == shares | ftps | wien
