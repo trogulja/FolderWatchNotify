@@ -99,6 +99,7 @@
     "chokidar": "3.1.1",
     "cron": "^1.8.2",
     "cron-parser": "^2.18.0",
+    "electron-log": "^4.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
     "lodash": "^4.17.20",

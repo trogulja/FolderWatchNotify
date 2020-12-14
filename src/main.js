@@ -59,7 +59,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
     },
-    icon: __dirname + '/img/lamp.ico'
+    icon: __dirname + '/img/lamp.ico',
   });
 
   mainWindowState.manage(mainWindow);
@@ -72,12 +72,12 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-  
+
   // Testing autoupdater
   autoUpdater.on('checking-for-update', () => {
     mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
   });
-  
+
   autoUpdater.on('before-quit-for-update', () => {
     mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Updating...`);
     controller.destroy();
@@ -113,6 +113,28 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 /**
+ * Logs
+ */
+const log = require('electron-log');
+if (environment === 'production') {
+  Object.assign(console, log.functions);
+  log.transports.file.level = 'debug';
+}
+
+// Handle errors
+log.catchErrors({
+  showDialog: false,
+  onError(error, versions, submitIssue) {
+    log.error('Error (' + error.message + '):\n```' + error.stack + '\n```\n' + `OS: ${versions.os}` + '\n```App: ' + versions.app);
+
+    submitIssue('https://github.com/trogulja/FolderWatchNotify/issues/new', {
+      title: `Error report for ${versions.app}`,
+      body: 'Error:\n```' + error.stack + '\n```\n' + `OS: ${versions.os}`,
+    });
+  },
+});
+
+/**
  * File watcher logic
  */
 
@@ -133,7 +155,6 @@ const controller = require('./controller');
 //   mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
 //   console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${msg}`);
 // });
-
 
 controller.events.on('log', function (msg) {
   mainWindow.webContents.send('log', msg);
