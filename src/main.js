@@ -75,13 +75,23 @@ const createWindow = () => {
 
   // Testing autoupdater
   autoUpdater.on('checking-for-update', () => {
-    mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
+    log.info(`[${new Date().toTimeString().split(' ')[0]}] Checking for update...`)
+    try {
+      mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
+    } catch (error) {
+      log.error(error)
+    }
   });
 
   autoUpdater.on('before-quit-for-update', () => {
-    mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Updating...`);
-    controller.destroy();
-    autoUpdater.quitAndInstall();
+    log.info(`[${new Date().toTimeString().split(' ')[0]}] Updating...`)
+    try {
+      mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Updating...`);
+      controller.destroy();
+      autoUpdater.quitAndInstall();
+    } catch (error) {
+      log.error(error)
+    }
   });
 };
 
@@ -122,12 +132,7 @@ if (environment === 'production') {
 }
 
 // Handle errors
-log.catchErrors({
-  showDialog: false,
-  onError(error, versions) {
-    log.error('Error (' + error.message + '):\n```' + error.stack + '\n```\n' + `OS: ${versions.os}` + '\n```App: ' + versions.app);
-  },
-});
+log.catchErrors({ showDialog: false });
 
 /**
  * File watcher logic

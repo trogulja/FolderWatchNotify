@@ -1,7 +1,7 @@
 {
   "name": "folderwatchnotify",
   "productName": "FolderWatchNotify",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Watches for new files and reports!",
   "repository": {
     "type": "git",
