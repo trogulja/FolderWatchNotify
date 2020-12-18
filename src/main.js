@@ -124,13 +124,8 @@ if (environment === 'production') {
 // Handle errors
 log.catchErrors({
   showDialog: false,
-  onError(error, versions, submitIssue) {
+  onError(error, versions) {
     log.error('Error (' + error.message + '):\n```' + error.stack + '\n```\n' + `OS: ${versions.os}` + '\n```App: ' + versions.app);
-
-    submitIssue('https://github.com/trogulja/FolderWatchNotify/issues/new', {
-      title: `Error report for ${versions.app}`,
-      body: 'Error:\n```' + error.stack + '\n```\n' + `OS: ${versions.os}`,
-    });
   },
 });
 
