@@ -96,8 +96,8 @@ var app = new Vue({
   },
   methods: {
     addLog: function (line) {
-      console.log('adding line to log', line);
-      console.log('status.txt', this.statusTxt);
+      // console.log('adding line to log', line);
+      // console.log('status.txt', this.statusTxt);
       this.log.unshift(line);
       if (this.log.length > 50) this.log.pop();
     },

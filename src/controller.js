@@ -251,18 +251,18 @@ function reportJobs() {
 
 function emitLog(s) {
   CronController.events.emit('log', `[${new Date().toTimeString().split(' ')[0]}] ${s}`);
-  console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${s}`);
+  // console.log('emitting log:', `[${new Date().toTimeString().split(' ')[0]}] ${s}`);
 }
 
 function emitInfo(s) {
   CronController.events.emit('info', s);
-  console.log('emitting info:', s);
+  // console.log('emitting info:', s);
 }
 
 function emitMeta(o) {
   CronController.events.emit('meta', o);
-  console.log('emitting meta:');
-  console.log(o);
+  // console.log('emitting meta:');
+  // console.log(o);
 }
 
 const cronjob = {};

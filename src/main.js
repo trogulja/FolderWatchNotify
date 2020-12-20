@@ -75,22 +75,22 @@ const createWindow = () => {
 
   // Testing autoupdater
   autoUpdater.on('checking-for-update', () => {
-    log.info(`[${new Date().toTimeString().split(' ')[0]}] Checking for update...`)
+    log.info(`[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
     try {
       mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Checking for update...`);
     } catch (error) {
-      log.error(error)
+      log.error(error);
     }
   });
 
   autoUpdater.on('before-quit-for-update', () => {
-    log.info(`[${new Date().toTimeString().split(' ')[0]}] Updating...`)
+    log.info(`[${new Date().toTimeString().split(' ')[0]}] Updating...`);
     try {
       mainWindow.webContents.send('log', `[${new Date().toTimeString().split(' ')[0]}] Updating...`);
       controller.destroy();
       autoUpdater.quitAndInstall();
     } catch (error) {
-      log.error(error)
+      log.error(error);
     }
   });
 };

@@ -35,7 +35,7 @@ class Config {
 let config = new Config();
 const conf = config.getAll();
 conf.forEach((c) => {
-  console.log(`${c.key} = ${c.value}`)
+  // console.log(`${c.key} = ${c.value}`)
   process.env[c.key] = c.value;
 });
 
